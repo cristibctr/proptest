@@ -29,6 +29,71 @@
 #![cfg_attr(all(feature = "std", feature = "unstable"), feature(ip))]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
+// std_facade is used in a few macros, so it needs to be public.
+#[macro_use]
+#[doc(hidden)]
+pub mod std_facade;
+
 #[cfg(any(feature = "std", test))]
 #[macro_use]
 extern crate std;
+
+#[cfg(all(feature = "alloc", not(feature = "std")))]
+#[macro_use]
+extern crate alloc;
+
+#[macro_use]
+mod product_tuple;
+
+#[macro_use]
+extern crate bitflags;
+#[cfg(feature = "bit-set")]
+extern crate bit_set;
+
+#[cfg(feature = "std")]
+#[macro_use]
+extern crate lazy_static;
+
+#[cfg(feature = "fork")]
+#[macro_use]
+extern crate rusty_fork;
+
+#[macro_use]
+mod macros;
+
+#[doc(hidden)]
+#[macro_use]
+pub mod sugar;
+
+pub mod arbitrary;
+pub mod array;
+pub mod bits;
+pub mod bool;
+pub mod char;
+pub mod collection;
+pub mod num;
+pub mod strategy;
+pub mod test_runner;
+pub mod tuple;
+
+pub mod option;
+#[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
+pub mod path;
+pub mod result;
+pub mod sample;
+#[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
+pub mod string;
+
+pub mod prelude;
+
+#[cfg(feature = "attr-macro")]
+pub use proptest_macro::property_test; 
+
+#[cfg(feature = "attr-macro")]
+#[test]
+fn compile_tests() {
+    let t = trybuild::TestCases::new();
+    t.pass("tests/pass/*.rs");
+}
